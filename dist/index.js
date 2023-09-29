@@ -27,7 +27,11 @@ exports.create = create;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -40,7 +44,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -78,9 +82,9 @@ class DefaultArtifactClient {
         return __awaiter(this, void 0, void 0, function* () {
             core.info(`Starting artifact upload
 For more detailed logs during the artifact upload process, enable step-debugging: https://docs.github.com/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging#enabling-step-debug-logging`);
-            path_and_artifact_name_validation_1.checkArtifactName(name);
+            (0, path_and_artifact_name_validation_1.checkArtifactName)(name);
             // Get specification for the files being uploaded
-            const uploadSpecification = upload_specification_1.getUploadSpecification(name, rootDirectory, files);
+            const uploadSpecification = (0, upload_specification_1.getUploadSpecification)(name, rootDirectory, files);
             const uploadResponse = {
                 artifactName: name,
                 artifactItems: [],
@@ -139,20 +143,20 @@ Note: The size of downloaded zips can differ significantly from the reported siz
             }
             const items = yield downloadHttpClient.getContainerItems(artifactToDownload.name, artifactToDownload.fileContainerResourceUrl);
             if (!path) {
-                path = config_variables_1.getWorkSpaceDirectory();
+                path = (0, config_variables_1.getWorkSpaceDirectory)();
             }
-            path = path_1.normalize(path);
-            path = path_1.resolve(path);
+            path = (0, path_1.normalize)(path);
+            path = (0, path_1.resolve)(path);
             // During upload, empty directories are rejected by the remote server so there should be no artifacts that consist of only empty directories
-            const downloadSpecification = download_specification_1.getDownloadSpecification(name, items.value, path, (options === null || options === void 0 ? void 0 : options.createArtifactFolder) || false);
+            const downloadSpecification = (0, download_specification_1.getDownloadSpecification)(name, items.value, path, (options === null || options === void 0 ? void 0 : options.createArtifactFolder) || false);
             if (downloadSpecification.filesToDownload.length === 0) {
                 core.info(`No downloadable files were found for the artifact: ${artifactToDownload.name}`);
             }
             else {
                 // Create all necessary directories recursively before starting any download
-                yield utils_1.createDirectoriesForArtifact(downloadSpecification.directoryStructure);
-                core.info('Directory structure has been setup for the artifact');
-                yield utils_1.createEmptyFilesForArtifact(downloadSpecification.emptyFilesToCreate);
+                yield (0, utils_1.createDirectoriesForArtifact)(downloadSpecification.directoryStructure);
+                core.info('Directory structure has been set up for the artifact');
+                yield (0, utils_1.createEmptyFilesForArtifact)(downloadSpecification.emptyFilesToCreate);
                 yield downloadHttpClient.downloadSingleArtifact(downloadSpecification.filesToDownload);
             }
             return {
@@ -171,10 +175,10 @@ Note: The size of downloaded zips can differ significantly from the reported siz
                 return response;
             }
             if (!path) {
-                path = config_variables_1.getWorkSpaceDirectory();
+                path = (0, config_variables_1.getWorkSpaceDirectory)();
             }
-            path = path_1.normalize(path);
-            path = path_1.resolve(path);
+            path = (0, path_1.normalize)(path);
+            path = (0, path_1.resolve)(path);
             let downloadedArtifacts = 0;
             while (downloadedArtifacts < artifacts.count) {
                 const currentArtifactToDownload = artifacts.value[downloadedArtifacts];
@@ -182,13 +186,13 @@ Note: The size of downloaded zips can differ significantly from the reported siz
                 core.info(`starting download of artifact ${currentArtifactToDownload.name} : ${downloadedArtifacts}/${artifacts.count}`);
                 // Get container entries for the specific artifact
                 const items = yield downloadHttpClient.getContainerItems(currentArtifactToDownload.name, currentArtifactToDownload.fileContainerResourceUrl);
-                const downloadSpecification = download_specification_1.getDownloadSpecification(currentArtifactToDownload.name, items.value, path, true);
+                const downloadSpecification = (0, download_specification_1.getDownloadSpecification)(currentArtifactToDownload.name, items.value, path, true);
                 if (downloadSpecification.filesToDownload.length === 0) {
                     core.info(`No downloadable files were found for any artifact ${currentArtifactToDownload.name}`);
                 }
                 else {
-                    yield utils_1.createDirectoriesForArtifact(downloadSpecification.directoryStructure);
-                    yield utils_1.createEmptyFilesForArtifact(downloadSpecification.emptyFilesToCreate);
+                    yield (0, utils_1.createDirectoriesForArtifact)(downloadSpecification.directoryStructure);
+                    yield (0, utils_1.createEmptyFilesForArtifact)(downloadSpecification.emptyFilesToCreate);
                     yield downloadHttpClient.downloadSingleArtifact(downloadSpecification.filesToDownload);
                 }
                 response.push({
@@ -211,7 +215,7 @@ exports.DefaultArtifactClient = DefaultArtifactClient;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRetentionDays = exports.getWorkSpaceDirectory = exports.getWorkFlowRunId = exports.getRuntimeUrl = exports.getRuntimeToken = exports.getDownloadFileConcurrency = exports.getInitialRetryIntervalInMilliseconds = exports.getRetryMultiplier = exports.getRetryLimit = exports.getUploadChunkSize = exports.getUploadFileConcurrency = void 0;
+exports.isGhes = exports.getRetentionDays = exports.getWorkSpaceDirectory = exports.getWorkFlowRunId = exports.getRuntimeUrl = exports.getRuntimeToken = exports.getDownloadFileConcurrency = exports.getInitialRetryIntervalInMilliseconds = exports.getRetryMultiplier = exports.getRetryLimit = exports.getUploadChunkSize = exports.getUploadFileConcurrency = void 0;
 // The number of concurrent uploads that happens at the same time
 function getUploadFileConcurrency() {
     return 2;
@@ -280,6 +284,11 @@ function getRetentionDays() {
     return process.env['GITHUB_RETENTION_DAYS'];
 }
 exports.getRetentionDays = getRetentionDays;
+function isGhes() {
+    const ghUrl = new URL(process.env['GITHUB_SERVER_URL'] || 'https://github.com');
+    return ghUrl.hostname.toUpperCase() !== 'GITHUB.COM';
+}
+exports.isGhes = isGhes;
 //# sourceMappingURL=config-variables.js.map
 
 /***/ }),
@@ -601,7 +610,11 @@ exports.default = CRC64;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -614,7 +627,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -641,7 +654,7 @@ const config_variables_1 = __nccwpck_require__(2222);
 const requestUtils_1 = __nccwpck_require__(755);
 class DownloadHttpClient {
     constructor() {
-        this.downloadHttpManager = new http_manager_1.HttpManager(config_variables_1.getDownloadFileConcurrency(), '@actions/artifact-download');
+        this.downloadHttpManager = new http_manager_1.HttpManager((0, config_variables_1.getDownloadFileConcurrency)(), '@actions/artifact-download');
         // downloads are usually significantly faster than uploads so display status information every second
         this.statusReporter = new status_reporter_1.StatusReporter(1000);
     }
@@ -650,11 +663,11 @@ class DownloadHttpClient {
      */
     listArtifacts() {
         return __awaiter(this, void 0, void 0, function* () {
-            const artifactUrl = utils_1.getArtifactUrl();
+            const artifactUrl = (0, utils_1.getArtifactUrl)();
             // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
             const client = this.downloadHttpManager.getClient(0);
-            const headers = utils_1.getDownloadHeaders('application/json');
-            const response = yield requestUtils_1.retryHttpClientRequest('List Artifacts', () => __awaiter(this, void 0, void 0, function* () { return client.get(artifactUrl, headers); }));
+            const headers = (0, utils_1.getDownloadHeaders)('application/json');
+            const response = yield (0, requestUtils_1.retryHttpClientRequest)('List Artifacts', () => __awaiter(this, void 0, void 0, function* () { return client.get(artifactUrl, headers); }));
             const body = yield response.readBody();
             return JSON.parse(body);
         });
@@ -671,8 +684,8 @@ class DownloadHttpClient {
             resourceUrl.searchParams.append('itemPath', artifactName);
             // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
             const client = this.downloadHttpManager.getClient(0);
-            const headers = utils_1.getDownloadHeaders('application/json');
-            const response = yield requestUtils_1.retryHttpClientRequest('Get Container Items', () => __awaiter(this, void 0, void 0, function* () { return client.get(resourceUrl.toString(), headers); }));
+            const headers = (0, utils_1.getDownloadHeaders)('application/json');
+            const response = yield (0, requestUtils_1.retryHttpClientRequest)('Get Container Items', () => __awaiter(this, void 0, void 0, function* () { return client.get(resourceUrl.toString(), headers); }));
             const body = yield response.readBody();
             return JSON.parse(body);
         });
@@ -683,7 +696,7 @@ class DownloadHttpClient {
      */
     downloadSingleArtifact(downloadItems) {
         return __awaiter(this, void 0, void 0, function* () {
-            const DOWNLOAD_CONCURRENCY = config_variables_1.getDownloadFileConcurrency();
+            const DOWNLOAD_CONCURRENCY = (0, config_variables_1.getDownloadFileConcurrency)();
             // limit the number of files downloaded at a single time
             core.debug(`Download file concurrency is set to ${DOWNLOAD_CONCURRENCY}`);
             const parallelDownloads = [...new Array(DOWNLOAD_CONCURRENCY).keys()];
@@ -723,9 +736,9 @@ class DownloadHttpClient {
     downloadIndividualFile(httpClientIndex, artifactLocation, downloadPath) {
         return __awaiter(this, void 0, void 0, function* () {
             let retryCount = 0;
-            const retryLimit = config_variables_1.getRetryLimit();
+            const retryLimit = (0, config_variables_1.getRetryLimit)();
             let destinationStream = fs.createWriteStream(downloadPath);
-            const headers = utils_1.getDownloadHeaders('application/json', true, true);
+            const headers = (0, utils_1.getDownloadHeaders)('application/json', true, true);
             // a single GET request is used to download a file
             const makeDownloadRequest = () => __awaiter(this, void 0, void 0, function* () {
                 const client = this.downloadHttpManager.getClient(httpClientIndex);
@@ -749,13 +762,13 @@ class DownloadHttpClient {
                     if (retryAfterValue) {
                         // Back off by waiting the specified time denoted by the retry-after header
                         core.info(`Backoff due to too many requests, retry #${retryCount}. Waiting for ${retryAfterValue} milliseconds before continuing the download`);
-                        yield utils_1.sleep(retryAfterValue);
+                        yield (0, utils_1.sleep)(retryAfterValue);
                     }
                     else {
                         // Back off using an exponential value that depends on the retry count
-                        const backoffTime = utils_1.getExponentialRetryTimeInMilliseconds(retryCount);
+                        const backoffTime = (0, utils_1.getExponentialRetryTimeInMilliseconds)(retryCount);
                         core.info(`Exponential backoff for retry #${retryCount}. Waiting for ${backoffTime} milliseconds before continuing the download`);
-                        yield utils_1.sleep(backoffTime);
+                        yield (0, utils_1.sleep)(backoffTime);
                     }
                     core.info(`Finished backoff for retry #${retryCount}, continuing with download`);
                 }
@@ -779,7 +792,7 @@ class DownloadHttpClient {
                         resolve();
                     }
                 });
-                yield utils_1.rmFile(fileDownloadPath);
+                yield (0, utils_1.rmFile)(fileDownloadPath);
                 destinationStream = fs.createWriteStream(fileDownloadPath);
             });
             // keep trying to download a file until a retry limit has been reached
@@ -798,7 +811,7 @@ class DownloadHttpClient {
                     continue;
                 }
                 let forceRetry = false;
-                if (utils_1.isSuccessStatusCode(response.message.statusCode)) {
+                if ((0, utils_1.isSuccessStatusCode)(response.message.statusCode)) {
                     // The body contains the contents of the file however calling response.readBody() causes all the content to be converted to a string
                     // which can cause some gzip encoded data to be lost
                     // Instead of using response.readBody(), response.message is a readableStream that can be directly used to get the raw body contents
@@ -806,7 +819,7 @@ class DownloadHttpClient {
                         const isGzipped = isGzip(response.message.headers);
                         yield this.pipeResponseToFile(response, destinationStream, isGzipped);
                         if (isGzipped ||
-                            isAllBytesReceived(response.message.headers['content-length'], yield utils_1.getFileSize(downloadPath))) {
+                            isAllBytesReceived(response.message.headers['content-length'], yield (0, utils_1.getFileSize)(downloadPath))) {
                             return;
                         }
                         else {
@@ -818,17 +831,17 @@ class DownloadHttpClient {
                         forceRetry = true;
                     }
                 }
-                if (forceRetry || utils_1.isRetryableStatusCode(response.message.statusCode)) {
+                if (forceRetry || (0, utils_1.isRetryableStatusCode)(response.message.statusCode)) {
                     core.info(`A ${response.message.statusCode} response code has been received while attempting to download an artifact`);
                     resetDestinationStream(downloadPath);
                     // if a throttled status code is received, try to get the retryAfter header value, else differ to standard exponential backoff
-                    utils_1.isThrottledStatusCode(response.message.statusCode)
-                        ? yield backOff(utils_1.tryGetRetryAfterValueTimeInMilliseconds(response.message.headers))
+                    (0, utils_1.isThrottledStatusCode)(response.message.statusCode)
+                        ? yield backOff((0, utils_1.tryGetRetryAfterValueTimeInMilliseconds)(response.message.headers))
                         : yield backOff();
                 }
                 else {
                     // Some unexpected response code, fail immediately and stop the download
-                    utils_1.displayHttpDiagnostics(response);
+                    (0, utils_1.displayHttpDiagnostics)(response);
                     return Promise.reject(new Error(`Unexpected http ${response.message.statusCode} during download for ${artifactLocation}`));
                 }
             }
@@ -847,14 +860,14 @@ class DownloadHttpClient {
                     const gunzip = zlib.createGunzip();
                     response.message
                         .on('error', error => {
-                        core.error(`An error occurred while attempting to read the response stream`);
+                        core.info(`An error occurred while attempting to read the response stream`);
                         gunzip.close();
                         destinationStream.close();
                         reject(error);
                     })
                         .pipe(gunzip)
                         .on('error', error => {
-                        core.error(`An error occurred while attempting to decompress the response stream`);
+                        core.info(`An error occurred while attempting to decompress the response stream`);
                         destinationStream.close();
                         reject(error);
                     })
@@ -863,14 +876,14 @@ class DownloadHttpClient {
                         resolve();
                     })
                         .on('error', error => {
-                        core.error(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
+                        core.info(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
                         reject(error);
                     });
                 }
                 else {
                     response.message
                         .on('error', error => {
-                        core.error(`An error occurred while attempting to read the response stream`);
+                        core.info(`An error occurred while attempting to read the response stream`);
                         destinationStream.close();
                         reject(error);
                     })
@@ -879,7 +892,7 @@ class DownloadHttpClient {
                         resolve();
                     })
                         .on('error', error => {
-                        core.error(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
+                        core.info(`An error occurred while writing a downloaded file to ${destinationStream.path}`);
                         reject(error);
                     });
                 }
@@ -900,7 +913,11 @@ exports.DownloadHttpClient = DownloadHttpClient;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -913,7 +930,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -991,7 +1008,7 @@ class HttpManager {
             throw new Error('There must be at least one client');
         }
         this.userAgent = userAgent;
-        this.clients = new Array(clientCount).fill(utils_1.createHttpClient(userAgent));
+        this.clients = new Array(clientCount).fill((0, utils_1.createHttpClient)(userAgent));
     }
     getClient(index) {
         return this.clients[index];
@@ -1000,7 +1017,7 @@ class HttpManager {
     // for more information see: https://github.com/actions/http-client/blob/04e5ad73cd3fd1f5610a32116b0759eddf6570d2/index.ts#L292
     disposeAndReplaceClient(index) {
         this.clients[index].dispose();
-        this.clients[index] = utils_1.createHttpClient(this.userAgent);
+        this.clients[index] = (0, utils_1.createHttpClient)(this.userAgent);
     }
     disposeAndReplaceAllClients() {
         for (const [index] of this.clients.entries()) {
@@ -1061,7 +1078,7 @@ Invalid characters include: ${Array.from(invalidArtifactNameCharacters.values())
 These characters are not allowed in the artifact name due to limitations with certain file systems such as NTFS. To maintain file system agnostic behavior, these characters are intentionally not allowed to prevent potential problems with downloads on different file systems.`);
         }
     }
-    core_1.info(`Artifact name is valid!`);
+    (0, core_1.info)(`Artifact name is valid!`);
 }
 exports.checkArtifactName = checkArtifactName;
 /**
@@ -1094,7 +1111,11 @@ exports.checkArtifactFilePath = checkArtifactFilePath;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1107,7 +1128,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1137,14 +1158,14 @@ function retry(name, operation, customErrorMessages, maxAttempts) {
             try {
                 response = yield operation();
                 statusCode = response.message.statusCode;
-                if (utils_1.isSuccessStatusCode(statusCode)) {
+                if ((0, utils_1.isSuccessStatusCode)(statusCode)) {
                     return response;
                 }
                 // Extra error information that we want to display if a particular response code is hit
                 if (statusCode) {
                     customErrorInformation = customErrorMessages.get(statusCode);
                 }
-                isRetryable = utils_1.isRetryableStatusCode(statusCode);
+                isRetryable = (0, utils_1.isRetryableStatusCode)(statusCode);
                 errorMessage = `Artifact service responded with ${statusCode}`;
             }
             catch (error) {
@@ -1154,16 +1175,16 @@ function retry(name, operation, customErrorMessages, maxAttempts) {
             if (!isRetryable) {
                 core.info(`${name} - Error is not retryable`);
                 if (response) {
-                    utils_1.displayHttpDiagnostics(response);
+                    (0, utils_1.displayHttpDiagnostics)(response);
                 }
                 break;
             }
             core.info(`${name} - Attempt ${attempt} of ${maxAttempts} failed with error: ${errorMessage}`);
-            yield utils_1.sleep(utils_1.getExponentialRetryTimeInMilliseconds(attempt));
+            yield (0, utils_1.sleep)((0, utils_1.getExponentialRetryTimeInMilliseconds)(attempt));
             attempt++;
         }
         if (response) {
-            utils_1.displayHttpDiagnostics(response);
+            (0, utils_1.displayHttpDiagnostics)(response);
         }
         if (customErrorInformation) {
             throw Error(`${name} failed: ${customErrorInformation}`);
@@ -1172,7 +1193,7 @@ function retry(name, operation, customErrorMessages, maxAttempts) {
     });
 }
 exports.retry = retry;
-function retryHttpClientRequest(name, method, customErrorMessages = new Map(), maxAttempts = config_variables_1.getRetryLimit()) {
+function retryHttpClientRequest(name, method, customErrorMessages = new Map(), maxAttempts = (0, config_variables_1.getRetryLimit)()) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield retry(name, method, customErrorMessages, maxAttempts);
     });
@@ -1214,14 +1235,14 @@ class StatusReporter {
         this.totalFileStatus = setInterval(() => {
             // display 1 decimal place without any rounding
             const percentage = this.formatPercentage(this.processedCount, this.totalNumberOfFilesToProcess);
-            core_1.info(`Total file count: ${this.totalNumberOfFilesToProcess} ---- Processed file #${this.processedCount} (${percentage.slice(0, percentage.indexOf('.') + 2)}%)`);
+            (0, core_1.info)(`Total file count: ${this.totalNumberOfFilesToProcess} ---- Processed file #${this.processedCount} (${percentage.slice(0, percentage.indexOf('.') + 2)}%)`);
         }, this.displayFrequencyInMilliseconds);
     }
     // if there is a large file that is being uploaded in chunks, this is used to display extra information about the status of the upload
     updateLargeFileStatus(fileName, chunkStartIndex, chunkEndIndex, totalUploadFileSize) {
         // display 1 decimal place without any rounding
         const percentage = this.formatPercentage(chunkEndIndex, totalUploadFileSize);
-        core_1.info(`Uploaded ${fileName} (${percentage.slice(0, percentage.indexOf('.') + 2)}%) bytes ${chunkStartIndex}:${chunkEndIndex}`);
+        (0, core_1.info)(`Uploaded ${fileName} (${percentage.slice(0, percentage.indexOf('.') + 2)}%) bytes ${chunkStartIndex}:${chunkEndIndex}`);
     }
     stop() {
         if (this.totalFileStatus) {
@@ -1248,7 +1269,11 @@ exports.StatusReporter = StatusReporter;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1261,7 +1286,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1286,19 +1311,34 @@ exports.createGZipFileInBuffer = exports.createGZipFileOnDisk = void 0;
 const fs = __importStar(__nccwpck_require__(5747));
 const zlib = __importStar(__nccwpck_require__(8761));
 const util_1 = __nccwpck_require__(1669);
-const stat = util_1.promisify(fs.stat);
+const stat = (0, util_1.promisify)(fs.stat);
 /**
  * GZipping certain files that are already compressed will likely not yield further size reductions. Creating large temporary gzip
  * files then will just waste a lot of time before ultimately being discarded (especially for very large files).
  * If any of these types of files are encountered then on-disk gzip creation will be skipped and the original file will be uploaded as-is
  */
 const gzipExemptFileExtensions = [
+    '.gz',
     '.gzip',
+    '.tgz',
+    '.taz',
+    '.Z',
+    '.taZ',
+    '.bz2',
+    '.tbz',
+    '.tbz2',
+    '.tz2',
+    '.lz',
+    '.lzma',
+    '.tlz',
+    '.lzo',
+    '.xz',
+    '.txz',
+    '.zst',
+    '.zstd',
+    '.tzst',
     '.zip',
-    '.tar.lz',
-    '.tar.gz',
-    '.tar.bz2',
-    '.7z'
+    '.7z' // 7ZIP
 ];
 /**
  * Creates a Gzip compressed file of an original file at the provided temporary filepath location
@@ -1327,7 +1367,7 @@ function createGZipFileOnDisk(originalFilePath, tempFilePath) {
             outputStream.on('error', error => {
                 // eslint-disable-next-line no-console
                 console.log(error);
-                reject;
+                reject(error);
             });
         });
     });
@@ -1341,22 +1381,29 @@ exports.createGZipFileOnDisk = createGZipFileOnDisk;
 function createGZipFileInBuffer(originalFilePath) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            var e_1, _a;
+            var _a, e_1, _b, _c;
             const inputStream = fs.createReadStream(originalFilePath);
             const gzip = zlib.createGzip();
             inputStream.pipe(gzip);
             // read stream into buffer, using experimental async iterators see https://github.com/nodejs/readable-stream/issues/403#issuecomment-479069043
             const chunks = [];
             try {
-                for (var gzip_1 = __asyncValues(gzip), gzip_1_1; gzip_1_1 = yield gzip_1.next(), !gzip_1_1.done;) {
-                    const chunk = gzip_1_1.value;
-                    chunks.push(chunk);
+                for (var _d = true, gzip_1 = __asyncValues(gzip), gzip_1_1; gzip_1_1 = yield gzip_1.next(), _a = gzip_1_1.done, !_a;) {
+                    _c = gzip_1_1.value;
+                    _d = false;
+                    try {
+                        const chunk = _c;
+                        chunks.push(chunk);
+                    }
+                    finally {
+                        _d = true;
+                    }
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (gzip_1_1 && !gzip_1_1.done && (_a = gzip_1.return)) yield _a.call(gzip_1);
+                    if (!_d && !_a && (_b = gzip_1.return)) yield _b.call(gzip_1);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
@@ -1376,7 +1423,11 @@ exports.createGZipFileInBuffer = createGZipFileInBuffer;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1389,7 +1440,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1418,10 +1469,10 @@ const http_client_1 = __nccwpck_require__(6255);
 const http_manager_1 = __nccwpck_require__(6527);
 const upload_gzip_1 = __nccwpck_require__(606);
 const requestUtils_1 = __nccwpck_require__(755);
-const stat = util_1.promisify(fs.stat);
+const stat = (0, util_1.promisify)(fs.stat);
 class UploadHttpClient {
     constructor() {
-        this.uploadHttpManager = new http_manager_1.HttpManager(config_variables_1.getUploadFileConcurrency(), '@actions/artifact-upload');
+        this.uploadHttpManager = new http_manager_1.HttpManager((0, config_variables_1.getUploadFileConcurrency)(), '@actions/artifact-upload');
         this.statusReporter = new status_reporter_1.StatusReporter(10000);
     }
     /**
@@ -1437,28 +1488,30 @@ class UploadHttpClient {
             };
             // calculate retention period
             if (options && options.retentionDays) {
-                const maxRetentionStr = config_variables_1.getRetentionDays();
-                parameters.RetentionDays = utils_1.getProperRetention(options.retentionDays, maxRetentionStr);
+                const maxRetentionStr = (0, config_variables_1.getRetentionDays)();
+                parameters.RetentionDays = (0, utils_1.getProperRetention)(options.retentionDays, maxRetentionStr);
             }
             const data = JSON.stringify(parameters, null, 2);
-            const artifactUrl = utils_1.getArtifactUrl();
+            const artifactUrl = (0, utils_1.getArtifactUrl)();
             // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
             const client = this.uploadHttpManager.getClient(0);
-            const headers = utils_1.getUploadHeaders('application/json', false);
+            const headers = (0, utils_1.getUploadHeaders)('application/json', false);
             // Extra information to display when a particular HTTP code is returned
             // If a 403 is returned when trying to create a file container, the customer has exceeded
             // their storage quota so no new artifact containers can be created
             const customErrorMessages = new Map([
                 [
                     http_client_1.HttpCodes.Forbidden,
-                    'Artifact storage quota has been hit. Unable to upload any new artifacts'
+                    (0, config_variables_1.isGhes)()
+                        ? 'Please reference [Enabling GitHub Actions for GitHub Enterprise Server](https://docs.github.com/en/enterprise-server@3.8/admin/github-actions/enabling-github-actions-for-github-enterprise-server) to ensure Actions storage is configured correctly.'
+                        : 'Artifact storage quota has been hit. Unable to upload any new artifacts'
                 ],
                 [
                     http_client_1.HttpCodes.BadRequest,
                     `The artifact name ${artifactName} is not valid. Request URL ${artifactUrl}`
                 ]
             ]);
-            const response = yield requestUtils_1.retryHttpClientRequest('Create Artifact Container', () => __awaiter(this, void 0, void 0, function* () { return client.post(artifactUrl, data, headers); }), customErrorMessages);
+            const response = yield (0, requestUtils_1.retryHttpClientRequest)('Create Artifact Container', () => __awaiter(this, void 0, void 0, function* () { return client.post(artifactUrl, data, headers); }), customErrorMessages);
             const body = yield response.readBody();
             return JSON.parse(body);
         });
@@ -1471,8 +1524,8 @@ class UploadHttpClient {
      */
     uploadArtifactToFileContainer(uploadUrl, filesToUpload, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const FILE_CONCURRENCY = config_variables_1.getUploadFileConcurrency();
-            const MAX_CHUNK_SIZE = config_variables_1.getUploadChunkSize();
+            const FILE_CONCURRENCY = (0, config_variables_1.getUploadFileConcurrency)();
+            const MAX_CHUNK_SIZE = (0, config_variables_1.getUploadChunkSize)();
             core.debug(`File Concurrency: ${FILE_CONCURRENCY}, and Chunk Size: ${MAX_CHUNK_SIZE}`);
             const parameters = [];
             // by default, file uploads will continue if there is an error unless specified differently in the options
@@ -1562,7 +1615,7 @@ class UploadHttpClient {
             // with named pipes the file size is reported as zero in that case don't read the file in memory
             if (!isFIFO && totalFileSize < 65536) {
                 core.debug(`${parameters.file} is less than 64k in size. Creating a gzip file in-memory to potentially reduce the upload size`);
-                const buffer = yield upload_gzip_1.createGZipFileInBuffer(parameters.file);
+                const buffer = yield (0, upload_gzip_1.createGZipFileInBuffer)(parameters.file);
                 // An open stream is needed in the event of a failure and we need to retry. If a NodeJS.ReadableStream is directly passed in,
                 // it will not properly get reset to the start of the stream if a chunk upload needs to be retried
                 let openUploadStream;
@@ -1602,7 +1655,7 @@ class UploadHttpClient {
                 const tempFile = yield tmp.file();
                 core.debug(`${parameters.file} is greater than 64k in size. Creating a gzip file on-disk ${tempFile.path} to potentially reduce the upload size`);
                 // create a GZip file of the original file being uploaded, the original file should not be modified in any way
-                uploadFileSize = yield upload_gzip_1.createGZipFileOnDisk(parameters.file, tempFile.path);
+                uploadFileSize = yield (0, upload_gzip_1.createGZipFileOnDisk)(parameters.file, tempFile.path);
                 let uploadFilePath = tempFile.path;
                 // compression did not help with size reduction, use the original file for upload and delete the temp GZip file
                 // for named pipes totalFileSize is zero, this assumes compression did help
@@ -1675,22 +1728,22 @@ class UploadHttpClient {
     uploadChunk(httpClientIndex, resourceUrl, openStream, start, end, uploadFileSize, isGzip, totalFileSize) {
         return __awaiter(this, void 0, void 0, function* () {
             // open a new stream and read it to compute the digest
-            const digest = yield utils_1.digestForStream(openStream());
+            const digest = yield (0, utils_1.digestForStream)(openStream());
             // prepare all the necessary headers before making any http call
-            const headers = utils_1.getUploadHeaders('application/octet-stream', true, isGzip, totalFileSize, end - start + 1, utils_1.getContentRange(start, end, uploadFileSize), digest);
+            const headers = (0, utils_1.getUploadHeaders)('application/octet-stream', true, isGzip, totalFileSize, end - start + 1, (0, utils_1.getContentRange)(start, end, uploadFileSize), digest);
             const uploadChunkRequest = () => __awaiter(this, void 0, void 0, function* () {
                 const client = this.uploadHttpManager.getClient(httpClientIndex);
                 return yield client.sendStream('PUT', resourceUrl, openStream(), headers);
             });
             let retryCount = 0;
-            const retryLimit = config_variables_1.getRetryLimit();
+            const retryLimit = (0, config_variables_1.getRetryLimit)();
             // Increments the current retry count and then checks if the retry limit has been reached
             // If there have been too many retries, fail so the download stops
             const incrementAndCheckRetryLimit = (response) => {
                 retryCount++;
                 if (retryCount > retryLimit) {
                     if (response) {
-                        utils_1.displayHttpDiagnostics(response);
+                        (0, utils_1.displayHttpDiagnostics)(response);
                     }
                     core.info(`Retry limit has been reached for chunk at offset ${start} to ${resourceUrl}`);
                     return true;
@@ -1701,12 +1754,12 @@ class UploadHttpClient {
                 this.uploadHttpManager.disposeAndReplaceClient(httpClientIndex);
                 if (retryAfterValue) {
                     core.info(`Backoff due to too many requests, retry #${retryCount}. Waiting for ${retryAfterValue} milliseconds before continuing the upload`);
-                    yield utils_1.sleep(retryAfterValue);
+                    yield (0, utils_1.sleep)(retryAfterValue);
                 }
                 else {
-                    const backoffTime = utils_1.getExponentialRetryTimeInMilliseconds(retryCount);
+                    const backoffTime = (0, utils_1.getExponentialRetryTimeInMilliseconds)(retryCount);
                     core.info(`Exponential backoff for retry #${retryCount}. Waiting for ${backoffTime} milliseconds before continuing the upload at offset ${start}`);
-                    yield utils_1.sleep(backoffTime);
+                    yield (0, utils_1.sleep)(backoffTime);
                 }
                 core.info(`Finished backoff for retry #${retryCount}, continuing with upload`);
                 return;
@@ -1731,21 +1784,21 @@ class UploadHttpClient {
                 // Always read the body of the response. There is potential for a resource leak if the body is not read which will
                 // result in the connection remaining open along with unintended consequences when trying to dispose of the client
                 yield response.readBody();
-                if (utils_1.isSuccessStatusCode(response.message.statusCode)) {
+                if ((0, utils_1.isSuccessStatusCode)(response.message.statusCode)) {
                     return true;
                 }
-                else if (utils_1.isRetryableStatusCode(response.message.statusCode)) {
+                else if ((0, utils_1.isRetryableStatusCode)(response.message.statusCode)) {
                     core.info(`A ${response.message.statusCode} status code has been received, will attempt to retry the upload`);
                     if (incrementAndCheckRetryLimit(response)) {
                         return false;
                     }
-                    utils_1.isThrottledStatusCode(response.message.statusCode)
-                        ? yield backOff(utils_1.tryGetRetryAfterValueTimeInMilliseconds(response.message.headers))
+                    (0, utils_1.isThrottledStatusCode)(response.message.statusCode)
+                        ? yield backOff((0, utils_1.tryGetRetryAfterValueTimeInMilliseconds)(response.message.headers))
                         : yield backOff();
                 }
                 else {
                     core.error(`Unexpected response. Unable to upload chunk to ${resourceUrl}`);
-                    utils_1.displayHttpDiagnostics(response);
+                    (0, utils_1.displayHttpDiagnostics)(response);
                     return false;
                 }
             }
@@ -1758,14 +1811,14 @@ class UploadHttpClient {
      */
     patchArtifactSize(size, artifactName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resourceUrl = new url_1.URL(utils_1.getArtifactUrl());
+            const resourceUrl = new url_1.URL((0, utils_1.getArtifactUrl)());
             resourceUrl.searchParams.append('artifactName', artifactName);
             const parameters = { Size: size };
             const data = JSON.stringify(parameters, null, 2);
             core.debug(`URL is ${resourceUrl.toString()}`);
             // use the first client from the httpManager, `keep-alive` is not used so the connection will close immediately
             const client = this.uploadHttpManager.getClient(0);
-            const headers = utils_1.getUploadHeaders('application/json', false);
+            const headers = (0, utils_1.getUploadHeaders)('application/json', false);
             // Extra information to display when a particular HTTP code is returned
             const customErrorMessages = new Map([
                 [
@@ -1774,7 +1827,7 @@ class UploadHttpClient {
                 ]
             ]);
             // TODO retry for all possible response codes, the artifact upload is pretty much complete so it at all costs we should try to finish this
-            const response = yield requestUtils_1.retryHttpClientRequest('Finalize artifact upload', () => __awaiter(this, void 0, void 0, function* () { return client.patch(resourceUrl.toString(), data, headers); }), customErrorMessages);
+            const response = yield (0, requestUtils_1.retryHttpClientRequest)('Finalize artifact upload', () => __awaiter(this, void 0, void 0, function* () { return client.patch(resourceUrl.toString(), data, headers); }), customErrorMessages);
             yield response.readBody();
             core.debug(`Artifact ${artifactName} has been successfully uploaded, total size in bytes: ${size}`);
         });
@@ -1792,7 +1845,11 @@ exports.UploadHttpClient = UploadHttpClient;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -1805,7 +1862,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1827,12 +1884,12 @@ function getUploadSpecification(artifactName, rootDirectory, artifactFiles) {
     if (!fs.existsSync(rootDirectory)) {
         throw new Error(`Provided rootDirectory ${rootDirectory} does not exist`);
     }
-    if (!fs.lstatSync(rootDirectory).isDirectory()) {
+    if (!fs.statSync(rootDirectory).isDirectory()) {
         throw new Error(`Provided rootDirectory ${rootDirectory} is not a valid directory`);
     }
     // Normalize and resolve, this allows for either absolute or relative paths to be used
-    rootDirectory = path_1.normalize(rootDirectory);
-    rootDirectory = path_1.resolve(rootDirectory);
+    rootDirectory = (0, path_1.normalize)(rootDirectory);
+    rootDirectory = (0, path_1.resolve)(rootDirectory);
     /*
        Example to demonstrate behavior
        
@@ -1856,16 +1913,16 @@ function getUploadSpecification(artifactName, rootDirectory, artifactFiles) {
         if (!fs.existsSync(file)) {
             throw new Error(`File ${file} does not exist`);
         }
-        if (!fs.lstatSync(file).isDirectory()) {
+        if (!fs.statSync(file).isDirectory()) {
             // Normalize and resolve, this allows for either absolute or relative paths to be used
-            file = path_1.normalize(file);
-            file = path_1.resolve(file);
+            file = (0, path_1.normalize)(file);
+            file = (0, path_1.resolve)(file);
             if (!file.startsWith(rootDirectory)) {
                 throw new Error(`The rootDirectory: ${rootDirectory} is not a parent directory of the file: ${file}`);
             }
             // Check for forbidden characters in file paths that will be rejected during upload
             const uploadPath = file.replace(rootDirectory, '');
-            path_and_artifact_name_validation_1.checkArtifactFilePath(uploadPath);
+            (0, path_and_artifact_name_validation_1.checkArtifactFilePath)(uploadPath);
             /*
               uploadFilePath denotes where the file will be uploaded in the file container on the server. During a run, if multiple artifacts are uploaded, they will all
               be saved in the same container. The artifact name is used as the root directory in the container to separate and distinguish uploaded artifacts
@@ -1878,12 +1935,12 @@ function getUploadSpecification(artifactName, rootDirectory, artifactFiles) {
             */
             specifications.push({
                 absoluteFilePath: file,
-                uploadFilePath: path_1.join(artifactName, uploadPath)
+                uploadFilePath: (0, path_1.join)(artifactName, uploadPath)
             });
         }
         else {
             // Directories are rejected by the server during upload
-            core_1.debug(`Removing ${file} from rawSearchResults because it is a directory`);
+            (0, core_1.debug)(`Removing ${file} from rawSearchResults because it is a directory`);
         }
     }
     return specifications;
@@ -1928,10 +1985,10 @@ function getExponentialRetryTimeInMilliseconds(retryCount) {
         throw new Error('RetryCount should not be negative');
     }
     else if (retryCount === 0) {
-        return config_variables_1.getInitialRetryIntervalInMilliseconds();
+        return (0, config_variables_1.getInitialRetryIntervalInMilliseconds)();
     }
-    const minTime = config_variables_1.getInitialRetryIntervalInMilliseconds() * config_variables_1.getRetryMultiplier() * retryCount;
-    const maxTime = minTime * config_variables_1.getRetryMultiplier();
+    const minTime = (0, config_variables_1.getInitialRetryIntervalInMilliseconds)() * (0, config_variables_1.getRetryMultiplier)() * retryCount;
+    const maxTime = minTime * (0, config_variables_1.getRetryMultiplier)();
     // returns a random number between the minTime (inclusive) and the maxTime (exclusive)
     return Math.trunc(Math.random() * (maxTime - minTime) + minTime);
 }
@@ -1999,13 +2056,13 @@ function tryGetRetryAfterValueTimeInMilliseconds(headers) {
     if (headers['retry-after']) {
         const retryTime = Number(headers['retry-after']);
         if (!isNaN(retryTime)) {
-            core_1.info(`Retry-After header is present with a value of ${retryTime}`);
+            (0, core_1.info)(`Retry-After header is present with a value of ${retryTime}`);
             return retryTime * 1000;
         }
-        core_1.info(`Returned retry-after header value: ${retryTime} is non-numeric and cannot be used`);
+        (0, core_1.info)(`Returned retry-after header value: ${retryTime} is non-numeric and cannot be used`);
         return undefined;
     }
-    core_1.info(`No retry-after header was found. Dumping all headers for diagnostic purposes`);
+    (0, core_1.info)(`No retry-after header was found. Dumping all headers for diagnostic purposes`);
     // eslint-disable-next-line no-console
     console.log(headers);
     return undefined;
@@ -2089,13 +2146,13 @@ function getUploadHeaders(contentType, isKeepAlive, isGzip, uncompressedLength, 
 exports.getUploadHeaders = getUploadHeaders;
 function createHttpClient(userAgent) {
     return new http_client_1.HttpClient(userAgent, [
-        new auth_1.BearerCredentialHandler(config_variables_1.getRuntimeToken())
+        new auth_1.BearerCredentialHandler((0, config_variables_1.getRuntimeToken)())
     ]);
 }
 exports.createHttpClient = createHttpClient;
 function getArtifactUrl() {
-    const artifactUrl = `${config_variables_1.getRuntimeUrl()}_apis/pipelines/workflows/${config_variables_1.getWorkFlowRunId()}/artifacts?api-version=${getApiVersion()}`;
-    core_1.debug(`Artifact Url: ${artifactUrl}`);
+    const artifactUrl = `${(0, config_variables_1.getRuntimeUrl)()}_apis/pipelines/workflows/${(0, config_variables_1.getWorkFlowRunId)()}/artifacts?api-version=${getApiVersion()}`;
+    (0, core_1.debug)(`Artifact Url: ${artifactUrl}`);
     return artifactUrl;
 }
 exports.getArtifactUrl = getArtifactUrl;
@@ -2109,7 +2166,7 @@ exports.getArtifactUrl = getArtifactUrl;
  * Other information such as the headers, the response code and message might be useful, so this is displayed.
  */
 function displayHttpDiagnostics(response) {
-    core_1.info(`##### Begin Diagnostic HTTP information #####
+    (0, core_1.info)(`##### Begin Diagnostic HTTP information #####
 Status Code: ${response.message.statusCode}
 Status Message: ${response.message.statusMessage}
 Header Information: ${JSON.stringify(response.message.headers, undefined, 2)}
@@ -2137,7 +2194,7 @@ exports.createEmptyFilesForArtifact = createEmptyFilesForArtifact;
 function getFileSize(filePath) {
     return __awaiter(this, void 0, void 0, function* () {
         const stats = yield fs_1.promises.stat(filePath);
-        core_1.debug(`${filePath} size:(${stats.size}) blksize:(${stats.blksize}) blocks:(${stats.blocks})`);
+        (0, core_1.debug)(`${filePath} size:(${stats.size}) blksize:(${stats.blksize}) blocks:(${stats.blocks})`);
         return stats.size;
     });
 }
@@ -2156,7 +2213,7 @@ function getProperRetention(retentionInput, retentionSetting) {
     if (retentionSetting) {
         const maxRetention = parseInt(retentionSetting);
         if (!isNaN(maxRetention) && maxRetention < retention) {
-            core_1.warning(`Retention days is greater than the max value allowed by the repository setting, reduce retention to ${maxRetention} days`);
+            (0, core_1.warning)(`Retention days is greater than the max value allowed by the repository setting, reduce retention to ${maxRetention} days`);
             retention = maxRetention;
         }
     }
@@ -2749,7 +2806,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -6191,6 +6248,19 @@ class HttpClientResponse {
             }));
         });
     }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }));
+        });
+    }
 }
 exports.HttpClientResponse = HttpClientResponse;
 function isHttps(requestUrl) {
@@ -6695,7 +6765,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -6705,6 +6781,10 @@ exports.getProxyUrl = getProxyUrl;
 function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
+    }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
     }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
@@ -6731,13 +6811,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
@@ -6777,11 +6868,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
+exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.READONLY = exports.UV_FS_O_EXLOCK = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rm = exports.rename = exports.readlink = exports.readdir = exports.open = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
 const fs = __importStar(__nccwpck_require__(5747));
 const path = __importStar(__nccwpck_require__(5622));
-_a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+_a = fs.promises
+// export const {open} = 'fs'
+, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.open = _a.open, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rm = _a.rm, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+// export const {open} = 'fs'
 exports.IS_WINDOWS = process.platform === 'win32';
+// See https://github.com/nodejs/node/blob/d0153aee367422d0858105abec186da4dff0a0c5/deps/uv/include/uv/win.h#L691
+exports.UV_FS_O_EXLOCK = 0x10000000;
+exports.READONLY = fs.constants.O_RDONLY;
 function exists(fsPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -6962,12 +7059,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
 const assert_1 = __nccwpck_require__(2357);
-const childProcess = __importStar(__nccwpck_require__(3129));
 const path = __importStar(__nccwpck_require__(5622));
-const util_1 = __nccwpck_require__(1669);
 const ioUtil = __importStar(__nccwpck_require__(1962));
-const exec = util_1.promisify(childProcess.exec);
-const execFile = util_1.promisify(childProcess.execFile);
 /**
  * Copies a file or folder.
  * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
@@ -7048,61 +7141,23 @@ exports.mv = mv;
 function rmRF(inputPath) {
     return __awaiter(this, void 0, void 0, function* () {
         if (ioUtil.IS_WINDOWS) {
-            // Node doesn't provide a delete operation, only an unlink function. This means that if the file is being used by another
-            // program (e.g. antivirus), it won't be deleted. To address this, we shell out the work to rd/del.
             // Check for invalid characters
             // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
             if (/[*"<>|]/.test(inputPath)) {
                 throw new Error('File path must not contain `*`, `"`, `<`, `>` or `|` on Windows');
             }
-            try {
-                const cmdPath = ioUtil.getCmdPath();
-                if (yield ioUtil.isDirectory(inputPath, true)) {
-                    yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
-                        env: { inputPath }
-                    });
-                }
-                else {
-                    yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
-                        env: { inputPath }
-                    });
-                }
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
-            // Shelling out fails to remove a symlink folder with missing source, this unlink catches that
-            try {
-                yield ioUtil.unlink(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
         }
-        else {
-            let isDir = false;
-            try {
-                isDir = yield ioUtil.isDirectory(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-                return;
-            }
-            if (isDir) {
-                yield execFile(`rm`, [`-rf`, `${inputPath}`]);
-            }
-            else {
-                yield ioUtil.unlink(inputPath);
-            }
+        try {
+            // note if path does not exist, error is silent
+            yield ioUtil.rm(inputPath, {
+                force: true,
+                maxRetries: 3,
+                recursive: true,
+                retryDelay: 300
+            });
+        }
+        catch (err) {
+            throw new Error(`File was unable to be removed ${err}`);
         }
     });
 }
@@ -14680,10 +14735,6 @@ function getNodeRequestOptions(request) {
 		agent = agent(parsedURL);
 	}
 
-	if (!headers.has('Connection') && !agent) {
-		headers.set('Connection', 'close');
-	}
-
 	// HTTP-network fetch step 4.2
 	// chunked encoding is handled by Node.js
 
@@ -15057,8 +15108,11 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 
 		if (headers['transfer-encoding'] === 'chunked' && !headers['content-length']) {
 			response.once('close', function (hadError) {
+				// tests for socket presence, as in some situations the
+				// the 'socket' event is not triggered for the request
+				// (happens in deno), avoids `TypeError`
 				// if a data listener is still present we didn't end cleanly
-				const hasDataListener = socket.listenerCount('data') > 0;
+				const hasDataListener = socket && socket.listenerCount('data') > 0;
 
 				if (hasDataListener && !hadError) {
 					const err = new Error('Premature close');
@@ -15100,6 +15154,7 @@ exports.Headers = Headers;
 exports.Request = Request;
 exports.Response = Response;
 exports.FetchError = FetchError;
+exports.AbortError = AbortError;
 
 
 /***/ }),
@@ -17211,7 +17266,7 @@ for (let i = 0; i < 256; ++i) {
 function unsafeStringify(arr, offset = 0) {
   // Note: Be careful editing this code!  It's been tuned for performance
   // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
-  return (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
+  return byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]];
 }
 
 function stringify(arr, offset = 0) {
@@ -20216,249 +20271,278 @@ const parse = dist/* parse */.Qc;
 
 
 async function run() {
-    try {
-        const lcovFile = external_path_.resolve(core.getInput('lcov-file'));
-        const commentTitle = core.getInput('comment-title');
-        const workingDirectory = external_path_.resolve(core.getInput('working-directory'));
-        const allFilesMinimumCoverage = parseFloat(core.getInput('all-files-minimum-coverage')) || 0;
-        const changedFilesMinimumCoverage = parseFloat(core.getInput('changed-files-minimum-coverage')) || 0;
-        const artifactName = core.getInput('artifact-name');
-        const githubToken = core.getInput('github-token');
-        const octokit = github.getOctokit(githubToken);
+  try {
+    const lcovFile = external_path_.resolve(core.getInput("lcov-file"));
+    const commentTitle = core.getInput("comment-title");
+    const workingDirectory = external_path_.resolve(core.getInput("working-directory"));
+    const allFilesMinimumCoverage =
+      parseFloat(core.getInput("all-files-minimum-coverage")) || 0;
+    const changedFilesMinimumCoverage =
+      parseFloat(core.getInput("changed-files-minimum-coverage")) || 0;
+    const artifactName = core.getInput("artifact-name");
+    const githubToken = core.getInput("github-token");
+    const octokit = github.getOctokit(githubToken);
 
-        console.log(`lcovFile: ${lcovFile}`);
-        console.log(`commentTitle: ${commentTitle}`);
-        console.log(`workingDirectory: ${workingDirectory}`);
-        console.log(`allFilesMinimumCoverage: ${allFilesMinimumCoverage}`);
-        console.log(`changedFilesMinimumCoverage: ${changedFilesMinimumCoverage}`);
-        console.log(`artifactName: ${artifactName}`);
-        console.log(`githubToken: ${githubToken}`);
+    console.log(`lcovFile: ${lcovFile}`);
+    console.log(`commentTitle: ${commentTitle}`);
+    console.log(`workingDirectory: ${workingDirectory}`);
+    console.log(`allFilesMinimumCoverage: ${allFilesMinimumCoverage}`);
+    console.log(`changedFilesMinimumCoverage: ${changedFilesMinimumCoverage}`);
+    console.log(`artifactName: ${artifactName}`);
+    console.log(`githubToken: ${githubToken}`);
 
-        const data = await parseLcov(lcovFile, workingDirectory);
-        const changedFiles = await getChangedFiles(octokit);
+    const data = await parseLcov(lcovFile, workingDirectory);
+    const changedFiles = await getChangedFiles(octokit);
 
-        const allFilesLcov = sumLcov(data);
-        const allFilesPassed = isPassed(allFilesLcov, allFilesMinimumCoverage);
-        const changedFilesLcov = sumLcov(data, changedFiles);
-        const hasChangedFiles = changedFilesLcov != undefined;
-        const changedFilesPassed = isPassed(changedFilesLcov, changedFilesMinimumCoverage);
-        const bothPassed = allFilesPassed && (!hasChangedFiles || changedFilesPassed);
-        if (!bothPassed) {
-            core.setFailed('Coverage is below the minimum');
-        }
-        console.log(`allFilesPassed: ${allFilesPassed}`);
-        console.log(`hasChangedFiles: ${hasChangedFiles}`);
-        console.log(`changedFilesPassed: ${changedFilesPassed}`);
-        console.log(`bothPassed: ${bothPassed}`);
-
-        const commentId = renderCommentId(commentTitle);
-
-        const comment = commentId +
-            renderCommentHeader(commentTitle, bothPassed) +
-            renderSectionHeader('All Files') +
-            renderLcovOverall(allFilesLcov, allFilesMinimumCoverage, allFilesPassed) +
-            renderSectionHeader('Changed Files') +
-            renderLcovOverall(changedFilesLcov, changedFilesMinimumCoverage, changedFilesPassed) +
-            renderLcovFiles(data, changedFiles);
-        console.log(comment);
-
-        if (github.context.eventName == 'pull_request') {
-            await postComment(octokit, commentId, comment);
-        } else {
-            console.log('Skipped posting comment');
-        };
-
-        if (artifactName != '') {
-            uploadArtifact(lcovFile, artifactName, workingDirectory);
-        } else {
-            console.log('Skipped uploading artifact');
-        }
-    } catch (error) {
-        core.setFailed(error.message);
+    const allFilesLcov = sumLcov(data);
+    const allFilesPassed = isPassed(allFilesLcov, allFilesMinimumCoverage);
+    const changedFilesLcov = sumLcov(data, changedFiles);
+    const hasChangedFiles = changedFilesLcov != undefined;
+    const changedFilesPassed = isPassed(
+      changedFilesLcov,
+      changedFilesMinimumCoverage
+    );
+    const bothPassed =
+      allFilesPassed && (!hasChangedFiles || changedFilesPassed);
+    if (!bothPassed) {
+      core.setFailed("Coverage is below the minimum");
     }
+    console.log(`allFilesPassed: ${allFilesPassed}`);
+    console.log(`hasChangedFiles: ${hasChangedFiles}`);
+    console.log(`changedFilesPassed: ${changedFilesPassed}`);
+    console.log(`bothPassed: ${bothPassed}`);
+
+    const commentId = renderCommentId(commentTitle);
+
+    const comment =
+      commentId +
+      renderCommentHeader(commentTitle, bothPassed) +
+      renderSectionHeader("All Files") +
+      renderLcovOverall(allFilesLcov, allFilesMinimumCoverage, allFilesPassed) +
+      renderSectionHeader("Changed Files") +
+      renderLcovOverall(
+        changedFilesLcov,
+        changedFilesMinimumCoverage,
+        changedFilesPassed
+      ) +
+      renderLcovFiles(data, changedFiles);
+    console.log(comment);
+
+    core.setOutput("comment", comment);
+
+    if (github.context.eventName == "pull_request") {
+      await postComment(octokit, commentId, comment);
+    } else {
+      console.log("Skipped posting comment");
+    }
+
+    if (artifactName != "") {
+      uploadArtifact(lcovFile, artifactName, workingDirectory);
+    } else {
+      console.log("Skipped uploading artifact");
+    }
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
 
 run();
 
 async function getChangedFiles(octokit) {
-    if (github.context.eventName != 'pull_request') return new Set();
-    console.log('Getting changed files...');
-    const { data: { files: files } } = await octokit.rest.repos.compareCommitsWithBasehead({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        basehead: `${github.context.payload.pull_request.base.sha}...${github.context.payload.pull_request.head.sha}`,
-        per_page: 1,
-    });
-    const fileNames = files.map((file) => external_path_.resolve(file.filename));
-    console.log(`Changed files: ${JSON.stringify(fileNames)}`)
-    return new Set(fileNames);
+  if (github.context.eventName != "pull_request") return new Set();
+  console.log("Getting changed files...");
+  const {
+    data: { files: files },
+  } = await octokit.rest.repos.compareCommitsWithBasehead({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    basehead: `${github.context.payload.pull_request.base.sha}...${github.context.payload.pull_request.head.sha}`,
+    per_page: 1,
+  });
+  const fileNames = files.map((file) => external_path_.resolve(file.filename));
+  console.log(`Changed files: ${JSON.stringify(fileNames)}`);
+  return new Set(fileNames);
 }
 
 async function postComment(octokit, commentId, comment) {
-    const comments = await getComments(octokit);
-    const existingComment = comments.find((comment) => comment.body.startsWith(commentId));
-    if (existingComment == undefined) {
-        console.log(`Existing comment is not found, creating new comment...`);
-        await createNewComment(octokit, comment);
-    } else {
-        console.log(`Existing comment is found, updating existing comment...`);
-        await updateComment(octokit, existingComment, comment);
-    }
+  const comments = await getComments(octokit);
+  const existingComment = comments.find((comment) =>
+    comment.body.startsWith(commentId)
+  );
+  if (existingComment == undefined) {
+    console.log(`Existing comment is not found, creating new comment...`);
+    await createNewComment(octokit, comment);
+  } else {
+    console.log(`Existing comment is found, updating existing comment...`);
+    await updateComment(octokit, existingComment, comment);
+  }
 }
 
 async function getComments(octokit) {
-    if (github.context.eventName != 'pull_request') return [];
-    console.log('Getting comments...');
-    const { data: comments } = await octokit.rest.issues.listComments({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: github.context.payload.pull_request.number,
-        per_page: 100,
-    });
-    console.log(`Comments: ${JSON.stringify(comments.map((comment) => comment.body))}`);
-    return comments;
+  if (github.context.eventName != "pull_request") return [];
+  console.log("Getting comments...");
+  const { data: comments } = await octokit.rest.issues.listComments({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: github.context.payload.pull_request.number,
+    per_page: 100,
+  });
+  console.log(
+    `Comments: ${JSON.stringify(comments.map((comment) => comment.body))}`
+  );
+  return comments;
 }
 
 async function createNewComment(octokit, comment) {
-    await octokit.rest.issues.createComment({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: github.context.payload.pull_request.number,
-        body: comment,
-    });
+  await octokit.rest.issues.createComment({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: github.context.payload.pull_request.number,
+    body: comment,
+  });
 }
 
 async function updateComment(octokit, existingComment, comment) {
-    await octokit.rest.issues.updateComment({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        comment_id: existingComment.id,
-        body: comment,
-    });
+  await octokit.rest.issues.updateComment({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    comment_id: existingComment.id,
+    body: comment,
+  });
 }
 
 async function parseLcov(lcovFile, workingDirectory) {
-    console.log('Parsing coverage file...');
-    return new Promise(resolve => {
-        lib(lcovFile, function (err, data) {
-            if (err != null) {
-                throw new Error(`Error parsing lcov file ${lcovFile}: ${err}`);
-            }
-            resolve(data.map((item) => {
-                item.file = external_path_.resolve(workingDirectory, item.file);
-                return item;
-            }));
-        });
-    })
+  console.log("Parsing coverage file...");
+  return new Promise((resolve) => {
+    lib(lcovFile, function (err, data) {
+      if (err != null) {
+        throw new Error(`Error parsing lcov file ${lcovFile}: ${err}`);
+      }
+      resolve(
+        data.map((item) => {
+          item.file = external_path_.resolve(workingDirectory, item.file);
+          return item;
+        })
+      );
+    });
+  });
 }
 
 function sumLcov(data, files) {
-    if (files != undefined) {
-        data = data.filter((item) => files.has(item.file));
-    }
+  if (files != undefined) {
+    data = data.filter((item) => files.has(item.file));
+  }
 
-    if (data.length == 0) {
-        return undefined;
-    }
+  if (data.length == 0) {
+    return undefined;
+  }
 
-    const sum = data.reduce((total, file) => {
-        const newTotal = JSON.parse(JSON.stringify(total));
-        newTotal.lines.found += file.lines.found;
-        newTotal.lines.hit += file.lines.hit;
-        newTotal.functions.found += file.functions.found;
-        newTotal.functions.hit += file.functions.hit;
-        newTotal.branches.found += file.branches.found;
-        newTotal.branches.hit += file.branches.hit;
-        return newTotal;
-    });
+  const sum = data.reduce((total, file) => {
+    const newTotal = JSON.parse(JSON.stringify(total));
+    newTotal.lines.found += file.lines.found;
+    newTotal.lines.hit += file.lines.hit;
+    newTotal.functions.found += file.functions.found;
+    newTotal.functions.hit += file.functions.hit;
+    newTotal.branches.found += file.branches.found;
+    newTotal.branches.hit += file.branches.hit;
+    return newTotal;
+  });
 
-    return sum;
+  return sum;
 }
 
 function isPassed(data, minimumCoverage) {
-    var coverage;
-    if (data == undefined || data.lines.found == 0) {
-        coverage = 0.0;
-    } else {
-        coverage = data.lines.hit * 100 / data.lines.found
-    }
-    return coverage >= minimumCoverage;
+  var coverage;
+  if (data == undefined || data.lines.found == 0) {
+    coverage = 0.0;
+  } else {
+    coverage = (data.lines.hit * 100) / data.lines.found;
+  }
+  return coverage >= minimumCoverage;
 }
 
 function renderLcovOverall(data, minimumCoverage, isPassed) {
-    if (data == undefined) {
-        return 'N/A\n'
-    }
-    const output =
-        `- Lines: ${renderLcovPercentage(data.lines)} ${renderPassed(isPassed)} (Minimum coverage is ${minimumCoverage}%)\n` +
-        `- Functions: ${renderLcovPercentage(data.functions)}\n` +
-        `- Branches: ${renderLcovPercentage(data.branches)}\n` +
-        '\n';
+  if (data == undefined) {
+    return "N/A\n";
+  }
+  const output =
+    `- Lines: ${renderLcovPercentage(data.lines)} ${renderPassed(
+      isPassed
+    )} (Minimum coverage is ${minimumCoverage}%)\n` +
+    `- Functions: ${renderLcovPercentage(data.functions)}\n` +
+    `- Branches: ${renderLcovPercentage(data.branches)}\n` +
+    "\n";
 
-    return output;
+  return output;
 }
 
 function renderLcovFiles(data, files) {
-    if (files != undefined) {
-        data = data.filter((item) => files.has(item.file));
-    }
+  if (files != undefined) {
+    data = data.filter((item) => files.has(item.file));
+  }
 
-    if (data.length == 0) {
-        return '';
-    }
+  if (data.length == 0) {
+    return "";
+  }
 
-    const table = [['File', 'Lines', 'Functions', 'Branches']];
+  const table = [["File", "Lines", "Functions", "Branches"]];
 
-    data.forEach(item => {
-        table.push(
-            [
-                external_path_.basename(item.file),
-                renderLcovPercentage(item.lines),
-                renderLcovPercentage(item.functions),
-                renderLcovPercentage(item.branches),
-            ]
-        )
-    });
+  data.forEach((item) => {
+    table.push([
+      external_path_.basename(item.file),
+      renderLcovPercentage(item.lines),
+      renderLcovPercentage(item.functions),
+      renderLcovPercentage(item.branches),
+    ]);
+  });
 
-    return markdownTable(table);
+  return markdownTable(table);
 }
 
 function renderLcovPercentage(lcov) {
-    const hit = lcov.hit;
-    const found = lcov.found;
-    if (found == 0) return 'N/A';
-    const percentage = (hit * 100 / found).toFixed(1);
-    return `${hit}/${found} (${percentage}%)`
+  const hit = lcov.hit;
+  const found = lcov.found;
+  if (found == 0) return "N/A";
+  const percentage = ((hit * 100) / found).toFixed(1);
+  return `${hit}/${found} (${percentage}%)`;
 }
 
 function renderCommentId(title) {
-    return `[lcov-comment-id]: <> (${title})\n`
+  return `[lcov-comment-id]: <> (${title})\n`;
 }
 
 function renderCommentHeader(title, isPassed) {
-    return `## LCOV Report${title !== '' ? ` - ${title}` : ''} ${renderPassed(isPassed)}\n`
+  return `## LCOV Report${title !== "" ? ` - ${title}` : ""} ${renderPassed(
+    isPassed
+  )}\n`;
 }
 
 function renderSectionHeader(title) {
-    return `### ${title}\n`;
+  return `### ${title}\n`;
 }
 
 function renderPassed(isPassed) {
-    if (isPassed) {
-        return '✅';
-    } else {
-        return '❌';
-    }
+  if (isPassed) {
+    return "✅";
+  } else {
+    return "❌";
+  }
 }
 
 async function uploadArtifact(lcovFile, artifactName, workingDirectory) {
-    const artifactPath = external_path_.resolve(v4());
-    await exec.exec(`genhtml ${lcovFile} -o ${artifactPath}`, [], { cwd: workingDirectory })
-    const globber = await glob.create(`${artifactPath}/**`);
-    const files = await globber.glob();
-    console.log('Uploading artifact...');
-    await artifact_client.create().uploadArtifact(artifactName, files, artifactPath, { continueOnError: false });
+  const artifactPath = external_path_.resolve(v4());
+  await exec.exec(`genhtml ${lcovFile} -o ${artifactPath}`, [], {
+    cwd: workingDirectory,
+  });
+  const globber = await glob.create(`${artifactPath}/**`);
+  const files = await globber.glob();
+  console.log("Uploading artifact...");
+  await artifact_client.create()
+    .uploadArtifact(artifactName, files, artifactPath, {
+      continueOnError: false,
+    });
 }
+
 })();
 
 
