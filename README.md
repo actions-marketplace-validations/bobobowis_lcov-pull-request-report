@@ -21,7 +21,7 @@ Action for reporting LCOV code coverage on pull requests
 
 # Usage
 ```yml
-- uses: boris-amenitiz/lcov-report-comment-generator@v1
+- uses: boris-amenitiz/lcov-pull-request-report@v1.0.0
   with:
     # Lcov file location. For example, coverage/lcov.info
     lcov-file: coverage/lcov.info
@@ -61,7 +61,7 @@ Write permission must be given for writing pull request comment. There are 2 way
 By default, action attaches comment to a pull request. However, if you want to use other action for publishing report, you can use the output as it follows:
 
 ```yaml
-- uses: boris-amenitiz/lcov-report-comment-generator@v1
+- uses: boris-amenitiz/lcov-pull-request-report@v1.0.0
     # give the id for the step, to access outputs in another step.
     id: coverage
 
