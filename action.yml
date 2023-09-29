@@ -18,6 +18,9 @@ inputs:
     description: 'Changed files minimum coverage in percentage, e.g. 0, 50, 100 (Default to 0)'
   artifact-name:
     description: 'Artifact name of the generated html (Default to empty / skip uploading artifact). Lcov is required to be installed.'
+outputs:
+  comment:
+    description: Generated markdown comment report.
 runs:
   using: 'node16'
   main: 'dist/index.js'
