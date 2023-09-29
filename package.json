@@ -1,5 +1,5 @@
 {
-  "name": "lcov-pull-request-report",
+  "name": "lcov-report-comment-generator",
   "version": "1.0.0",
   "type": "module",
   "description": "Action for reporting LCOV code coverage on pull requests",

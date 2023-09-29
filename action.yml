@@ -1,4 +1,4 @@
-name: 'LCOV Pull Request Report'
+name: 'LCOV Report Comment Generator'
 description: 'Action for reporting LCOV code coverage on pull requests'
 branding:
   icon: 'umbrella'
@@ -21,4 +21,4 @@ inputs:
 runs:
   using: 'node16'
   main: 'dist/index.js'
-  
+

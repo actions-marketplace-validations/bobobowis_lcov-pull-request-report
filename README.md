@@ -1,4 +1,4 @@
-# LCOV Pull Request Report
+# LCOV Report Comment Generator
 Action for reporting LCOV code coverage on pull requests
 
 # Sample Report
@@ -21,17 +21,14 @@ Action for reporting LCOV code coverage on pull requests
 
 # Usage
 ```yml
-# Required for generating html artifact, can be skipped if not generating html artifact
-- uses: hrishikesh-kadam/setup-lcov@v1 
-
-- uses: kefasjw/lcov-pull-request-report@v1
+- uses: boris-amenitiz/lcov-report-comment-generator@v1
   with:
     # Lcov file location. For example, coverage/lcov.info
     lcov-file: coverage/lcov.info
 
     # Github token required for getting list of changed files and posting comments
     github-token: ${{ secrets.GITHUB_TOKEN }}
-    
+
     # Working directory
     # Default: empty (repository root)
     working-directory:
@@ -58,6 +55,24 @@ Action for reporting LCOV code coverage on pull requests
 Write permission must be given for writing pull request comment. There are 2 ways:
 - Enable "Read and write permissions" in Repository Settings > Code and automation > Actions > General > Workflow permissions, or
 - Add `permissions: write-all` to the job. See https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+
+## Outputs
+
+By default, action attaches comment to a pull request. However, if you want to use other action for publishing report, you can use the output as it follows:
+
+```yaml
+- uses: boris-amenitiz/lcov-report-comment-generator@v1
+    # give the id for the step, to access outputs in another step.
+    id: coverage
+
+- uses: marocchino/sticky-pull-request-comment@v2
+    with:
+      # pass output from the previous step by id.
+      message: ${{ steps.coverage.outputs.report }}
+```
+
+Also, you can use this data on other platforms. For instance, you can send report to your [Slack](https://github.com/slackapi/slack-github-action) or [Jira](https://github.com/atlassian/gajira-comment).
+
 
 # License
 
